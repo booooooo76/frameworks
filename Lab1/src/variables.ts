@@ -29,7 +29,7 @@ let cities: Array<string> = ["Київ", "Львів", "Одеса"]; // Аль�
 
 // Масив чисел
 let numbers: number[] = [1, 2, 3, 4, 5];
-let scores: Array<number> = [95, 87, 92, 88, 90];
+let scores: Array<string|number> = [95, 87, 92, 88, 90];
 
 console.log("\n=== Виведення масивів ===");
 console.log("Фрукти:", fruits);

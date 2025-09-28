@@ -8,7 +8,7 @@ function calculateIceCreamPriceBrowser(): void {
     const caramelInput = prompt("Додати карамель (+6 грн)? (так/ні)");
     const berriesInput = prompt("Додати ягоди (+10 грн)? (так/ні)");
     
-    let toppings: string[] = [];
+    let toppings: ("шоколад"|"карамель"| "ягоди")[] = [];
     
     if (chocolateInput?.toLowerCase() === "так") {
         price += 5;
