@@ -1,11 +1,10 @@
-// Інтерфейс, що описує поведінку тварини
 interface Animal {
-    // Обов'язкові властивості (є у всіх тварин)
+    // Обов'язкові властивості 
     name: string;
     age: number;
     species: string;
     
-    // Опціональні властивості (не у всіх тварин)
+    // Опціональні властивості 
     numberOfLegs?: number;      // У риб немає ніг
     canFly?: boolean;           // Тільки деякі птахи літають
     canSwim?: boolean;          // Не всі тварини плавають
@@ -13,14 +12,14 @@ interface Animal {
     wingspan?: number;          // Тільки у птахів
     habitat?: string;           // Середовище проживання
     
-    // Методи для опису поведінки
+    // Методи 
     move(): void;
     makeSound(): void;
     eat(food: string): void;
     sleep(): void;
 }
 
-// Клас Cat (Кіт)
+
 class Cat implements Animal {
     name: string;
     age: number;
@@ -34,7 +33,7 @@ class Cat implements Animal {
         this.age = age;
         this.species = "Felis catus";
         this.numberOfLegs = 4;
-        this.canSwim = false; // Коти зазвичай не люблять воду
+        this.canSwim = false; 
         this.furColor = furColor;
     }
     
@@ -54,13 +53,13 @@ class Cat implements Animal {
         console.log(`${this.name} згорнувся клубочком і спить`);
     }
     
-    // Додатковий метод специфічний для котів
+    // Додатковий метод
     purr(): void {
         console.log(`${this.name} муркоче від задоволення`);
     }
 }
 
-// Клас Bird (Птах)
+
 class Bird implements Animal {
     name: string;
     age: number;
@@ -112,13 +111,13 @@ class Bird implements Animal {
         console.log(`${this.name} спить на гілці, сховавши голову під крило`);
     }
     
-    // Додатковий метод для птахів
+    // Додатковий метод
     buildNest(): void {
         console.log(`${this.name} будує гніздо`);
     }
 }
 
-// Клас Fish (Риба)
+
 class Fish implements Animal {
     name: string;
     age: number;
@@ -139,8 +138,7 @@ class Fish implements Animal {
         this.canSwim = true;
         this.habitat = "вода";
         this.waterType = waterType;
-        // Зверніть увагу: numberOfLegs не визначено, бо у риб немає ніг
-        // furColor також не визначено - у риб немає хутра
+        
     }
     
     move(): void {
@@ -159,22 +157,22 @@ class Fish implements Animal {
         console.log(`${this.name} завмирає у воді з відкритими очима`);
     }
     
-    // Додатковий метод для риб
+    // Додатковий метод
     blowBubbles(): void {
         console.log(`${this.name} випускає бульбашки`);
     }
 }
 
-// Приклад використання
+
 console.log("=== Демонстрація роботи класів ===\n");
 
-// Створюємо екземпляри тварин
+
 const myCat = new Cat("Мурчик", 3, "рудий");
 const myBird = new Bird("Кеша", 2, "Corvus", true, 50);
-const myPenguin = new Bird("Пінгі", 5, "Spheniscidae", false); // Пінгвін не літає
+const myPenguin = new Bird("Пінгі", 5, "Spheniscidae", false); 
 const myFish = new Fish("Немо", 1, "Amphiprion", "солона");
 
-// Демонструємо роботу методів
+
 console.log("--- Кіт ---");
 myCat.move();
 myCat.makeSound();
@@ -200,23 +198,8 @@ myFish.eat("водорості");
 myFish.blowBubbles();
 console.log(`Середовище: ${myFish.habitat}`);
 
-// Демонстрація опціональних властивостей
 console.log("\n=== Опціональні властивості ===");
 console.log(`${myCat.name} має ${myCat.numberOfLegs} лапи`);
 console.log(`${myBird.name} має розмах крил: ${myBird.wingspan} см`);
 console.log(`${myFish.name} має ніг:  "немає"`);
 console.log(`${myFish.name} має хутро: ${(myFish as any).furColor || "немає"}`);
-
-// Функція для перевірки, чи може тварина плавати
-function checkSwimming(animal: Animal): void {
-    if (animal.canSwim !== undefined) {
-        console.log(`${animal.name} ${animal.canSwim ? "вміє" : "не вміє"} плавати`);
-    } else {
-        console.log(`Невідомо, чи ${animal.name} вміє плавати`);
-    }
-}
-
-console.log("\n=== Перевірка здатності плавати ===");
-checkSwimming(myCat);
-checkSwimming(myFish);
-checkSwimming(myBird);

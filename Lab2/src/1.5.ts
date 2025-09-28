@@ -1,11 +1,9 @@
-// Інтерфейс Course
 interface Course {
     name: string;
-    duration: number; // тривалість в годинах
-    students: string[]; // масив студентів
+    duration: number;
+    students: string[];
 }
 
-// Клас OnlineCourse
 class OnlineCourse implements Course {
     name: string;
     duration: number;
@@ -17,7 +15,7 @@ class OnlineCourse implements Course {
         this.students = [];
     }
     
-    // Метод для реєстрації студента на курс
+    // Метод для реєстрації
     registerStudent(student: string): void {
         if (!this.isStudentRegistered(student)) {
             this.students.push(student);
@@ -27,13 +25,12 @@ class OnlineCourse implements Course {
         }
     }
     
-    // Метод для перевірки чи студент зареєстрований
+   // Метод для перевірки чи студент зареєстрований
     isStudentRegistered(student: string): boolean {
-        return this.students.indexOf(student) !== -1;
-    }
+        return this.students.includes(student);
+}
 }
 
-// Клас CourseManager
 class CourseManager {
     private courses: Course[];
     
@@ -41,13 +38,11 @@ class CourseManager {
         this.courses = [];
     }
     
-    // Метод для додавання курсу
     addCourse(course: Course): void {
         this.courses.push(course);
         console.log(`Курс "${course.name}" додано до системи`);
     }
     
-    // Метод для видалення курсу
     removeCourse(courseName: string): void {
         const index = this.courses.findIndex(course => course.name === courseName);
         if (index !== -1) {
@@ -97,24 +92,22 @@ const datascience = new OnlineCourse("Data Science Fundamentals", 100);
 // Створення менеджера курсів
 const courseManager = new CourseManager();
 
-// Додавання курсів до менеджера
 console.log("--- Додавання курсів ---");
 courseManager.addCourse(jsBasics);
 courseManager.addCourse(pythonAdvanced);
 courseManager.addCourse(webDevelopment);
 courseManager.addCourse(datascience);
 
-// Реєстрація студентів на курси
 console.log("\n--- Реєстрація студентів ---");
 jsBasics.registerStudent("Олександр Коваленко");
 jsBasics.registerStudent("Марія Петренко");
 jsBasics.registerStudent("Іван Шевченко");
-jsBasics.registerStudent("Марія Петренко"); // Спроба повторної реєстрації
+jsBasics.registerStudent("Марія Петренко"); 
 
 pythonAdvanced.registerStudent("Анна Ткаченко");
 pythonAdvanced.registerStudent("Петро Мельник");
 
-webDevelopment.registerStudent("Олександр Коваленко"); // Той самий студент на іншому курсі
+webDevelopment.registerStudent("Олександр Коваленко");
 webDevelopment.registerStudent("Василь Кравченко");
 webDevelopment.registerStudent("Ольга Бондаренко");
 webDevelopment.registerStudent("Марія Петренко");
@@ -122,12 +115,10 @@ webDevelopment.registerStudent("Марія Петренко");
 datascience.registerStudent("Анна Ткаченко");
 datascience.registerStudent("Дмитро Сидоренко");
 
-// Перевірка реєстрації студентів
 console.log("\n--- Перевірка реєстрації ---");
 console.log(`Чи зареєстрований "Олександр Коваленко" на JavaScript Basics? ${jsBasics.isStudentRegistered("Олександр Коваленко") ? "Так" : "Ні"}`);
 console.log(`Чи зареєстрований "Дмитро Сидоренко" на JavaScript Basics? ${jsBasics.isStudentRegistered("Дмитро Сидоренко") ? "Так" : "Ні"}`);
 
-// Пошук курсу за назвою
 console.log("\n--- Пошук курсу ---");
 const foundCourse = courseManager.findCourse("Python Advanced");
 if (foundCourse) {
@@ -139,13 +130,11 @@ if (foundCourse) {
 // Виведення списку всіх курсів
 courseManager.displayAllCourses();
 
-// Видалення курсу
 console.log("\n--- Видалення курсу ---");
 courseManager.removeCourse("Data Science Fundamentals");
 
 // Виведення оновленого списку курсів
 courseManager.displayAllCourses();
 
-// Спроба видалити неіснуючий курс
 console.log("\n--- Спроба видалити неіснуючий курс ---");
 courseManager.removeCourse("Machine Learning");

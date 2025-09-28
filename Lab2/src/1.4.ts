@@ -1,9 +1,7 @@
-// Інтерфейс Payable
 interface Payable {
     pay(): void;
 }
 
-// Абстрактний клас Employee
 abstract class Employee {
     protected name: string;
     protected age: number;
@@ -19,7 +17,6 @@ abstract class Employee {
     abstract getAnnualBonus(): number;
 }
 
-// Клас Developer (Розробник)
 class Developer extends Employee implements Payable {
     constructor(name: string, age: number, salary: number) {
         super(name, age, salary);
@@ -27,37 +24,31 @@ class Developer extends Employee implements Payable {
     
     // Реалізація абстрактного методу - бонус 10% від зарплати
     getAnnualBonus(): number {
-        return this.salary * 0.1 * 12; // 10% від річної зарплати
+        return this.salary * 0.1 * 12; 
     }
     
-    // Імплементація методу pay() з інтерфейсу Payable
     pay(): void {
         console.log(`Виплачено зарплату розробнику ${this.name}: ${this.salary} грн`);
     }
 }
 
-// Клас Manager (Менеджер)
 class Manager extends Employee implements Payable {
     constructor(name: string, age: number, salary: number) {
         super(name, age, salary);
     }
     
-    // Реалізація абстрактного методу - бонус 20% від зарплати
     getAnnualBonus(): number {
-        return this.salary * 0.2 * 12; // 20% від річної зарплати
+        return this.salary * 0.2 * 12; 
     }
     
-    // Імплементація методу pay() з інтерфейсу Payable
     pay(): void {
         console.log(`Виплачено зарплату менеджеру ${this.name}: ${this.salary} грн`);
     }
 }
 
-// ============= ДЕМОНСТРАЦІЯ РОБОТИ =============
 
 console.log("========== СИСТЕМА УПРАВЛІННЯ СПІВРОБІТНИКАМИ ==========\n");
 
-// Створення масиву об'єктів типу Employee
 const employees: Employee[] = [
     new Developer("Олександр Коваленко", 28, 45000),
     new Developer("Марія Петренко", 25, 35000),
@@ -68,7 +59,6 @@ const employees: Employee[] = [
     new Manager("Василь Кравченко", 45, 80000)
 ];
 
-// Виведення інформації про співробітників та їхні бонуси
 console.log("Список співробітників та їхні річні бонуси:");
 console.log("-".repeat(60));
 
@@ -93,25 +83,6 @@ console.log("\n========== ПІДСУМКИ ==========");
 console.log(`Загальна кількість співробітників: ${employees.length}`);
 console.log(`Загальна річна сума бонусів: ${totalAnnualBonuses.toFixed(2)} грн`);
 
-// Окремий підрахунок для розробників та менеджерів
-const developersBonuses = employees
-    .filter(emp => emp instanceof Developer)
-    .reduce((total, emp) => total + emp.getAnnualBonus(), 0);
-
-const managersBonuses = employees
-    .filter(emp => emp instanceof Manager)
-    .reduce((total, emp) => total + emp.getAnnualBonus(), 0);
-
-const developersCount = employees.filter(emp => emp instanceof Developer).length;
-const managersCount = employees.filter(emp => emp instanceof Manager).length;
-
-console.log(`\nРозробники (${developersCount} осіб):`);
-console.log(`  Загальна сума бонусів: ${developersBonuses.toFixed(2)} грн`);
-console.log(`  Середній бонус: ${(developersBonuses / developersCount).toFixed(2)} грн`);
-
-console.log(`\nМенеджери (${managersCount} осіб):`);
-console.log(`  Загальна сума бонусів: ${managersBonuses.toFixed(2)} грн`);
-console.log(`  Середній бонус: ${(managersBonuses / managersCount).toFixed(2)} грн`);
 
 // Демонстрація роботи методу pay() з інтерфейсу Payable
 console.log("\n========== ВИПЛАТА ЗАРПЛАТ ==========");
@@ -123,15 +94,3 @@ employees.forEach(employee => {
     }
 });
 
-// Альтернативний спосіб - створення масиву Payable
-console.log("\n========== РОБОТА З ІНТЕРФЕЙСОМ PAYABLE ==========");
-
-const payableEmployees: Payable[] = [
-    new Developer("Тестовий Розробник", 30, 50000),
-    new Manager("Тестовий Менеджер", 38, 70000)
-];
-
-console.log("Виплата через інтерфейс Payable:");
-payableEmployees.forEach(payable => {
-    payable.pay();
-});

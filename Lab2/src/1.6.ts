@@ -1,11 +1,9 @@
-// Інтерфейс LibraryItem
 interface LibraryItem {
     title: string;
     author: string;
     borrow(): void;
 }
 
-// Клас Book
 class Book implements LibraryItem {
     title: string;
     author: string;
@@ -29,7 +27,6 @@ class Book implements LibraryItem {
     }
 }
 
-// Клас Magazine
 class Magazine implements LibraryItem {
     title: string;
     author: string;
@@ -53,11 +50,10 @@ class Magazine implements LibraryItem {
     }
 }
 
-// Клас DVD
 class DVD implements LibraryItem {
     title: string;
-    author: string; // для DVD це може бути режисер
-    duration: number; // тривалість в хвилинах
+    author: string; 
+    duration: number; 
     isBorrowed: boolean;
     
     constructor(title: string, author: string, duration: number) {
@@ -77,7 +73,6 @@ class DVD implements LibraryItem {
     }
 }
 
-// Клас Library
 class Library {
     private items: LibraryItem[];
     
@@ -85,13 +80,11 @@ class Library {
         this.items = [];
     }
     
-    // Метод для додавання елементів до бібліотеки
     addItem(item: LibraryItem): void {
         this.items.push(item);
         console.log(`"${item.title}" додано до бібліотеки`);
     }
     
-    // Метод для пошуку елементів за назвою
     findItemByName(name: string): LibraryItem | undefined {
         return this.items.find(item => item.title === name);
     }
@@ -102,7 +95,6 @@ class Library {
         let availableCount = 0;
         
         this.items.forEach((item, index) => {
-            // Перевірка чи елемент доступний (не позичений)
             if (item instanceof Book && !item.isBorrowed) {
                 console.log(`${index + 1}. Книга: "${item.title}" - ${item.author} (${item.pages} сторінок)`);
                 availableCount++;
@@ -126,10 +118,8 @@ class Library {
 
 console.log("========== БІБЛІОТЕЧНА СИСТЕМА ==========\n");
 
-// Створення бібліотеки
 const library = new Library();
 
-// Створення різних елементів
 const book1 = new Book("Кобзар", "Тарас Шевченко", 350);
 const book2 = new Book("Лісова пісня", "Леся Українка", 180);
 const book3 = new Book("1984", "Джордж Орвелл", 328);
@@ -140,7 +130,6 @@ const magazine2 = new Magazine("Science", "Наукова спільнота", 1
 const dvd1 = new DVD("Inception", "Крістофер Нолан", 148);
 const dvd2 = new DVD("The Matrix", "Вачовскі", 136);
 
-// Додавання елементів до бібліотеки
 console.log("--- Додавання елементів до бібліотеки ---");
 library.addItem(book1);
 library.addItem(book2);
@@ -150,10 +139,8 @@ library.addItem(magazine2);
 library.addItem(dvd1);
 library.addItem(dvd2);
 
-// Виведення доступних елементів
 library.displayAvailableItems();
 
-// Пошук елементів за назвою
 console.log("\n--- Пошук елементів ---");
 const foundItem = library.findItemByName("Кобзар");
 if (foundItem) {
@@ -169,7 +156,6 @@ if (notFoundItem) {
     console.log("Елемент 'Невідома книга' не знайдено");
 }
 
-// Позичення елементів
 console.log("\n--- Позичення елементів ---");
 book1.borrow();
 magazine1.borrow();
@@ -178,19 +164,15 @@ dvd1.borrow();
 // Спроба позичити вже позичений елемент
 book1.borrow();
 
-// Позичення ще кількох елементів
 book3.borrow();
 dvd2.borrow();
 
-// Виведення оновленого списку доступних елементів
 library.displayAvailableItems();
 
-// Пошук та позичення елемента
 console.log("\n--- Пошук та позичення ---");
 const itemToBorrow = library.findItemByName("Лісова пісня");
 if (itemToBorrow) {
     itemToBorrow.borrow();
 }
 
-// Фінальний список доступних елементів
 library.displayAvailableItems();
