@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управління бібліотекою</title>
+    <link rel="stylesheet" href="libs/bootstrap.css">
+    <style>
+        .book-card, .user-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .book-card:hover, .user-card:hover {
+            transform: translateY(-5px);
+        }
+        .book-card.borrowed {
+            opacity: 0.6;
+        }
+        .badge-borrowed {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">Система управління бібліотекою</h1>
+        
+        <div class="row mb-4">
+            <!-- Add Book Form -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Додати книгу</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="addBookForm">
+                            <div class="mb-3">
+                                <label class="form-label">Назва книги</label>
+                                <input type="text" class="form-control" id="bookTitle" required>
+                                <div class="invalid-feedback">Це поле обов'язкове</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Автор</label>
+                                <input type="text" class="form-control" id="bookAuthor" required>
+                                <div class="invalid-feedback">Це поле обов'язкове</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Рік видання</label>
+                                <input type="text" class="form-control" id="bookYear" required>
+                                <div class="invalid-feedback">Введіть коректний рік</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Додати книгу</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add User Form -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Додати користувача</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="addUserForm">
+                            <div class="mb-3">
+                                <label class="form-label">Ім'я користувача</label>
+                                <input type="text" class="form-control" id="userName" required>
+                                <div class="invalid-feedback">Це поле обов'язкове</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ID користувача</label>
+                                <input type="text" class="form-control" id="userId" required>
+                                <div class="invalid-feedback">Введіть тільки цифри</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Додати користувача</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Books List -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Список книг</h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="booksList"></div>
+            </div>
+        </div>
+        
+        <!-- Users List -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Список користувачів</h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="usersList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Borrow Modal -->
+    <div class="modal fade" id="borrowModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Позичити книгу</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="borrowMessage"></p>
+                    <div id="userSelectContainer">
+                        <label class="form-label">Оберіть користувача:</label>
+                        <select class="form-select" id="userSelect">
+                            <option value="">Оберіть користувача</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                    <button type="button" class="btn btn-primary" id="confirmBorrow">Підтвердити</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Return Modal -->
+    <div class="modal fade" id="returnModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Повернення книги</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="returnMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                    <button type="button" class="btn btn-primary" id="confirmReturn">Підтвердити</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Повідомлення</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/bundle.js"></script>
+</body>
+</html>

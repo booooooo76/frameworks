@@ -90,7 +90,7 @@ console.log("\n========== ВИПЛАТА ЗАРПЛАТ ==========");
 employees.forEach(employee => {
     // Кожен співробітник імплементує Payable, тому можемо викликати pay()
     if (employee instanceof Developer || employee instanceof Manager) {
-        (employee as Payable).pay();
+        employee.pay();
     }
 });
 

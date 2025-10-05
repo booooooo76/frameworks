@@ -5,12 +5,12 @@ interface Animal {
     species: string;
     
     // Опціональні властивості 
-    numberOfLegs?: number;      // У риб немає ніг
-    canFly?: boolean;           // Тільки деякі птахи літають
-    canSwim?: boolean;          // Не всі тварини плавають
-    furColor?: string;          // У риб немає хутра
-    wingspan?: number;          // Тільки у птахів
-    habitat?: string;           // Середовище проживання
+    numberOfLegs?: number;      
+    canFly?: boolean;           
+    canSwim?: boolean;          
+    furColor?: string;         
+    wingspan?: number;          
+    habitat?: string;           
     
     // Методи 
     move(): void;
