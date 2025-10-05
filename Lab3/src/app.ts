@@ -9,6 +9,11 @@ class App {
     private libraryService: LibraryService;
     private modal: Modal;
     private selectedBook: Book | null = null;
+    private currentBookPage: number = 1;
+    private currentUserPage: number = 1;
+    private readonly itemsPerPage: number = 5;
+    private bookSearchTerm: string = '';
+    private userSearchTerm: string = '';
 
     constructor() {
         this.libraryService = new LibraryService();
@@ -33,6 +38,49 @@ class App {
         const userForm = document.getElementById('addUserForm');
         if (userForm) {
             userForm.addEventListener('submit', (e) => this.handleAddUser(e));
+        }
+
+        // Search books
+        const bookSearchInput = document.getElementById('bookSearch') as HTMLInputElement;
+        if (bookSearchInput) {
+            bookSearchInput.addEventListener('input', (e) => {
+                this.bookSearchTerm = (e.target as HTMLInputElement).value;
+                this.currentBookPage = 1;
+                this.renderBooks();
+            });
+        }
+
+        // Search users
+        const userSearchInput = document.getElementById('userSearch') as HTMLInputElement;
+        if (userSearchInput) {
+            userSearchInput.addEventListener('input', (e) => {
+                this.userSearchTerm = (e.target as HTMLInputElement).value;
+                this.currentUserPage = 1;
+                this.renderUsers();
+            });
+        }
+
+        // Clear search buttons
+        const clearBookSearch = document.getElementById('clearBookSearch');
+        if (clearBookSearch) {
+            clearBookSearch.addEventListener('click', () => {
+                this.bookSearchTerm = '';
+                const searchInput = document.getElementById('bookSearch') as HTMLInputElement;
+                if (searchInput) searchInput.value = '';
+                this.currentBookPage = 1;
+                this.renderBooks();
+            });
+        }
+
+        const clearUserSearch = document.getElementById('clearUserSearch');
+        if (clearUserSearch) {
+            clearUserSearch.addEventListener('click', () => {
+                this.userSearchTerm = '';
+                const searchInput = document.getElementById('userSearch') as HTMLInputElement;
+                if (searchInput) searchInput.value = '';
+                this.currentUserPage = 1;
+                this.renderUsers();
+            });
         }
     }
 
@@ -77,7 +125,8 @@ class App {
         authorInput.value = '';
         yearInput.value = '';
 
-        // Render books
+        // Reset to first page and render books
+        this.currentBookPage = 1;
         this.renderBooks();
         
         // Show success message
@@ -124,7 +173,8 @@ class App {
         nameInput.value = '';
         idInput.value = '';
 
-        // Render users
+        // Reset to first page and render users
+        this.currentUserPage = 1;
         this.renderUsers();
         
         // Show success message
@@ -176,87 +226,241 @@ class App {
         }
     }
 
+    private handleDeleteBook(book: Book): void {
+        const confirmed = confirm(`Видалити книгу "${book.getTitle()}"?`);
+        if (confirmed) {
+            const result = this.libraryService.deleteBook(book.id);
+            if (result.success) {
+                this.modal.showSuccess(result.message);
+                this.renderBooks();
+            } else {
+                this.modal.showError(result.message);
+            }
+        }
+    }
+
+    private handleDeleteUser(user: User): void {
+        const confirmed = confirm(`Видалити користувача "${user.getName()}"?`);
+        if (confirmed) {
+            const result = this.libraryService.deleteUser(user.id);
+            if (result.success) {
+                this.modal.showSuccess(result.message);
+                this.renderUsers();
+            } else {
+                this.modal.showError(result.message);
+            }
+        }
+    }
+
     private renderBooks(): void {
         const container = document.getElementById('booksList');
-        if (!container) return;
+        const paginationContainer = document.getElementById('booksPagination');
+        if (!container || !paginationContainer) return;
 
-        const books = this.libraryService.getBooks();
-        
-        if (books.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center">Немає доданих книг</p>';
-            return;
+        // Filter books based on search term
+        let books = this.libraryService.getBooks();
+        if (this.bookSearchTerm) {
+            books = this.libraryService.searchBooks(this.bookSearchTerm);
         }
 
-        container.innerHTML = '';
+        const totalBooks = books.length;
+        const totalPages = Math.ceil(totalBooks / this.itemsPerPage);
         
-        books.forEach(book => {
-            const bookCard = document.createElement('div');
-            bookCard.className = 'col-md-4 mb-3';
+        // Adjust current page if needed
+        if (this.currentBookPage > totalPages && totalPages > 0) {
+            this.currentBookPage = totalPages;
+        }
+
+        // Get books for current page
+        const startIndex = (this.currentBookPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const booksToShow = books.slice(startIndex, endIndex);
+
+        // Render books
+        if (booksToShow.length === 0) {
+            const noBooksMessage = this.bookSearchTerm 
+                ? '<p class="text-muted text-center">Книги за вашим запитом не знайдено</p>'
+                : '<p class="text-muted text-center">Немає доданих книг</p>';
+            container.innerHTML = noBooksMessage;
+        } else {
+            container.innerHTML = '';
             
-            const isBorrowed = book.isBorrowed;
-            const user = book.borrowedBy ? this.libraryService.findUserById(book.borrowedBy) : null;
-            
-            bookCard.innerHTML = `
-                <div class="card book-card ${isBorrowed ? 'borrowed' : ''}" style="position: relative;">
-                    ${isBorrowed ? '<span class="badge bg-danger badge-borrowed">Позичена</span>' : ''}
-                    <div class="card-body">
-                        <h6 class="card-title">${book.getTitle()}</h6>
-                        <p class="card-text">
-                            <small class="text-muted">Автор: ${book.getAuthor()}</small><br>
-                            <small class="text-muted">Рік: ${book.getYear()}</small>
-                            ${isBorrowed && user ? `<br><small class="text-danger">Позичив: ${user.getName()}</small>` : ''}
-                        </p>
-                        <button class="btn btn-sm ${isBorrowed ? 'btn-warning' : 'btn-primary'} w-100">
-                            ${isBorrowed ? 'Повернути' : 'Позичити'}
-                        </button>
+            booksToShow.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.className = 'col-md-4 mb-3';
+                
+                const isBorrowed = book.isBorrowed;
+                const user = book.borrowedBy ? this.libraryService.findUserById(book.borrowedBy) : null;
+                
+                bookCard.innerHTML = `
+                    <div class="card book-card ${isBorrowed ? 'borrowed' : ''}" style="position: relative;">
+                        ${isBorrowed ? '<span class="badge bg-danger badge-borrowed">Позичена</span>' : ''}
+                        <div class="card-body">
+                            <h6 class="card-title">${book.getTitle()}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">Автор: ${book.getAuthor()}</small><br>
+                                <small class="text-muted">Рік: ${book.getYear()}</small>
+                                ${isBorrowed && user ? `<br><small class="text-danger">Позичив: ${user.getName()}</small>` : ''}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm ${isBorrowed ? 'btn-warning' : 'btn-primary'} flex-grow-1 borrow-btn">
+                                    ${isBorrowed ? 'Повернути' : 'Позичити'}
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" title="Видалити книгу">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `;
-            
-            const button = bookCard.querySelector('button');
-            if (button) {
-                button.addEventListener('click', () => this.handleBookClick(book));
-            }
-            
-            container.appendChild(bookCard);
-        });
+                `;
+                
+                const borrowButton = bookCard.querySelector('.borrow-btn');
+                const deleteButton = bookCard.querySelector('.delete-btn');
+                
+                if (borrowButton) {
+                    borrowButton.addEventListener('click', () => this.handleBookClick(book));
+                }
+                
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', () => this.handleDeleteBook(book));
+                }
+                
+                container.appendChild(bookCard);
+            });
+        }
+
+        // Render pagination
+        this.renderPagination(paginationContainer, this.currentBookPage, totalPages, 'book');
     }
 
     private renderUsers(): void {
         const container = document.getElementById('usersList');
-        if (!container) return;
+        const paginationContainer = document.getElementById('usersPagination');
+        if (!container || !paginationContainer) return;
 
-        const users = this.libraryService.getUsers();
+        // Filter users based on search term
+        let users = this.libraryService.getUsers();
+        if (this.userSearchTerm) {
+            users = this.libraryService.searchUsers(this.userSearchTerm);
+        }
+
+        const totalUsers = users.length;
+        const totalPages = Math.ceil(totalUsers / this.itemsPerPage);
         
-        if (users.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center">Немає доданих користувачів</p>';
+        // Adjust current page if needed
+        if (this.currentUserPage > totalPages && totalPages > 0) {
+            this.currentUserPage = totalPages;
+        }
+
+        // Get users for current page
+        const startIndex = (this.currentUserPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const usersToShow = users.slice(startIndex, endIndex);
+
+        // Render users
+        if (usersToShow.length === 0) {
+            const noUsersMessage = this.userSearchTerm
+                ? '<p class="text-muted text-center">Користувачі за вашим запитом не знайдені</p>'
+                : '<p class="text-muted text-center">Немає доданих користувачів</p>';
+            container.innerHTML = noUsersMessage;
+        } else {
+            container.innerHTML = '';
+            
+            usersToShow.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'col-md-4 mb-3';
+                
+                const borrowedCount = user.getBorrowedBooksCount();
+                const canBorrowMore = user.canBorrowMore();
+                
+                userCard.innerHTML = `
+                    <div class="card user-card">
+                        <div class="card-body">
+                            <h6 class="card-title">${user.getName()}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">ID: ${user.getId()}</small><br>
+                                <span class="badge ${canBorrowMore ? 'bg-success' : 'bg-danger'}">
+                                    Позичено книг: ${borrowedCount}/3
+                                </span>
+                            </p>
+                            <button class="btn btn-sm btn-outline-danger w-100 delete-user-btn" ${borrowedCount > 0 ? 'disabled' : ''}>
+                                ${borrowedCount > 0 ? 'Не можна видалити (є позичені книги)' : 'Видалити'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                const deleteButton = userCard.querySelector('.delete-user-btn');
+                if (deleteButton && borrowedCount === 0) {
+                    deleteButton.addEventListener('click', () => this.handleDeleteUser(user));
+                }
+                
+                container.appendChild(userCard);
+            });
+        }
+
+        // Render pagination
+        this.renderPagination(paginationContainer, this.currentUserPage, totalPages, 'user');
+    }
+
+    private renderPagination(container: HTMLElement, currentPage: number, totalPages: number, type: 'book' | 'user'): void {
+        if (totalPages <= 1) {
+            container.innerHTML = '';
             return;
         }
 
-        container.innerHTML = '';
-        
-        users.forEach(user => {
-            const userCard = document.createElement('div');
-            userCard.className = 'col-md-4 mb-3';
-            
-            const borrowedCount = user.getBorrowedBooksCount();
-            const canBorrowMore = user.canBorrowMore();
-            
-            userCard.innerHTML = `
-                <div class="card user-card">
-                    <div class="card-body">
-                        <h6 class="card-title">${user.getName()}</h6>
-                        <p class="card-text">
-                            <small class="text-muted">ID: ${user.getId()}</small><br>
-                            <span class="badge ${canBorrowMore ? 'bg-success' : 'bg-danger'}">
-                                Позичено книг: ${borrowedCount}/3
-                            </span>
-                        </p>
-                    </div>
-                </div>
+        let paginationHTML = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center">
+        `;
+
+        // Previous button
+        const prevDisabled = currentPage === 1 ? 'disabled' : '';
+        paginationHTML += `
+            <li class="page-item ${prevDisabled}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}">Попередня</a>
+            </li>
+        `;
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const active = i === currentPage ? 'active' : '';
+            paginationHTML += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
             `;
-            
-            container.appendChild(userCard);
+        }
+
+        // Next button
+        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+        paginationHTML += `
+            <li class="page-item ${nextDisabled}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}">Наступна</a>
+            </li>
+        `;
+
+        paginationHTML += `
+                </ul>
+            </nav>
+        `;
+
+        container.innerHTML = paginationHTML;
+
+        // Add event listeners to pagination links
+        const pageLinks = container.querySelectorAll('.page-link');
+        pageLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = parseInt(link.getAttribute('data-page') || '1');
+                if (type === 'book') {
+                    this.currentBookPage = page;
+                    this.renderBooks();
+                } else {
+                    this.currentUserPage = page;
+                    this.renderUsers();
+                }
+            });
         });
     }
 

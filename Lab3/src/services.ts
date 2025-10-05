@@ -28,6 +28,27 @@ export class LibraryService {
         return this.booksLibrary.findById(id);
     }
 
+    deleteBook(bookId: string): { success: boolean; message: string } {
+        const book = this.findBookById(bookId);
+        
+        if (!book) {
+            return { success: false, message: 'Книгу не знайдено' };
+        }
+
+        if (book.isBorrowed) {
+            return { success: false, message: 'Не можна видалити позичену книгу' };
+        }
+
+        const bookIndex = this.booksLibrary.findIndex(b => b.id === bookId);
+        if (bookIndex !== -1) {
+            this.booksLibrary.remove(bookIndex);
+            this.saveToStorage();
+            return { success: true, message: `Книга "${book.getTitle()}" успішно видалена` };
+        }
+
+        return { success: false, message: 'Помилка при видаленні книги' };
+    }
+
     // User methods
     addUser(id: string, name: string): User | null {
         // Check if user with this ID already exists
@@ -48,6 +69,48 @@ export class LibraryService {
 
     findUserById(id: string): User | undefined {
         return this.usersLibrary.findById(id);
+    }
+
+    deleteUser(userId: string): { success: boolean; message: string } {
+        const user = this.findUserById(userId);
+        
+        if (!user) {
+            return { success: false, message: 'Користувача не знайдено' };
+        }
+
+        if (user.getBorrowedBooksCount() > 0) {
+            return { success: false, message: 'Не можна видалити користувача з позиченими книгами' };
+        }
+
+        const userIndex = this.usersLibrary.findIndex(u => u.id === userId);
+        if (userIndex !== -1) {
+            this.usersLibrary.remove(userIndex);
+            this.saveToStorage();
+            return { success: true, message: `Користувач "${user.getName()}" успішно видалений` };
+        }
+
+        return { success: false, message: 'Помилка при видаленні користувача' };
+    }
+
+    // Search methods
+    searchBooks(searchTerm: string): Book[] {
+        const term = searchTerm.toLowerCase().trim();
+        if (!term) return this.getBooks();
+
+        return this.booksLibrary.findAll((book) => 
+            book.getTitle().toLowerCase().includes(term) ||
+            book.getAuthor().toLowerCase().includes(term)
+        );
+    }
+
+    searchUsers(searchTerm: string): User[] {
+        const term = searchTerm.toLowerCase().trim();
+        if (!term) return this.getUsers();
+
+        return this.usersLibrary.findAll((user) => 
+            user.getName().toLowerCase().includes(term) ||
+            user.getId().toLowerCase().includes(term)
+        );
     }
 
     // Borrow and return methods
@@ -101,21 +164,6 @@ export class LibraryService {
         this.saveToStorage();
 
         return { success: true, message: `Книга "${bookTitle}" успішно повернута від користувача ${userName}` };
-    }
-
-    // Search methods
-    searchBooksByAuthor(author: string): Book[] {
-        const searchTerm = author.toLowerCase();
-        return this.booksLibrary.findAll((book) => 
-            book.getAuthor().toLowerCase().includes(searchTerm)
-        );
-    }
-
-    searchBooksByTitle(title: string): Book[] {
-        const searchTerm = title.toLowerCase();
-        return this.booksLibrary.findAll((book) => 
-            book.getTitle().toLowerCase().includes(searchTerm)
-        );
     }
 
     // Storage methods
