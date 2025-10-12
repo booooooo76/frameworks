@@ -4,7 +4,6 @@ export class Modal {
     private alertModal: any;
 
     constructor() {
-        // Initialize Bootstrap modals
         const borrowModalEl = document.getElementById('borrowModal');
         const returnModalEl = document.getElementById('returnModal');
         const alertModalEl = document.getElementById('alertModal');
@@ -29,7 +28,6 @@ export class Modal {
             if (messageEl && selectEl && confirmBtn) {
                 messageEl.textContent = `Ви хочете позичити книгу "${bookTitle}"?`;
                 
-                // Populate user select
                 selectEl.innerHTML = '<option value="">Оберіть користувача</option>';
                 users.forEach(user => {
                     const option = document.createElement('option');

@@ -113,7 +113,6 @@ export class LibraryService {
         );
     }
 
-    // Borrow and return methods
     borrowBook(bookId: string, userId: string): { success: boolean; message: string } {
         const book = this.findBookById(bookId);
         const user = this.findUserById(userId);

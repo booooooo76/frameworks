@@ -1,10 +1,8 @@
-// Import all modules
 import {Book, User} from './models';
 import {LibraryService} from './services';
 import {Validation} from './validation';
 import {Modal} from './modal';
 
-// Main App class
 class App {
     private libraryService: LibraryService;
     private modal: Modal;
