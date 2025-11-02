@@ -1,0 +1,78 @@
+// src/styles/main.scss
+
+// Обов'язкові частини Bootstrap
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+
+// Необхідні компоненти
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/utilities";
+
+// Ваші глобальні стилі
+body {
+  background-color: #f8f9fa;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+// ДОДАЙТЕ ЦІ СТИЛІ ДЛЯ ЦЕНТРУВАННЯ
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.row.justify-content-center {
+  width: 100%;
+  max-width: 1200px; // або інше значення за потребою
+}
+
+// Стилі для модальних вікон
+.modal-mask {
+  position: fixed;
+  z-index: 1050;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center; // Додаємо центрування
+  align-items: flex-start; // або center для вертикального центрування
+  transition: opacity 0.3s ease;
+  overflow-y: auto;
+  padding: 20px 0; // Додаємо відступи
+}
+
+.modal-dialog {
+  margin: auto; // Центруємо модальне вікно
+  max-width: 500px; // Фіксуємо ширину
+  width: 100%;
+}
+
+// Стилі для переможців
+.badge {
+  font-size: 0.875rem;
+  padding: 0.5em 0.75em;
+}
+
+.btn-close {
+  opacity: 1;
+}
